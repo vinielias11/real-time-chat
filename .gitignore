@@ -1,0 +1,45 @@
+# ============================
+# Rust / Axum
+# ============================
+/target/
+Cargo.lock
+*.rs.bk
+
+# SQLx offline cache
+.sqlx/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# ============================
+# Node / Vue
+# ============================
+node_modules/
+dist/
+.npm/
+.pnpm-store/
+yarn.lock
+pnpm-lock.yaml
+
+# Env files
+.env
+.env.*.local
+
+# Cache
+.cache/
+.temp/
+*.local
+
+# Editor
+*.swp
+*.swo
+
+# ============================
+# OS junk
+# ============================
+.DS_Store
+Thumbs.db

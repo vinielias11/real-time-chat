@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: real-time-chat
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgresDb:/var/lib/postgresql/data
+
+volumes:
+  postgresDb:
