@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
+use::axum::{ Router, routing::get, routing::post, http::header, http::Method };
+use::tower_http::cors::{ CorsLayer, AllowOrigin };
+use sqlx::{PgPool, postgres::PgPoolOptions};
+use::dotenv::dotenv;
+
 mod handler;
 mod model;
 mod schema;
 
-use::axum::{ Router, routing::get, routing::post };
-use::dotenv::dotenv;
-
-use handler::usuario_handler::hello_world;
-use sqlx::{PgPool, postgres::PgPoolOptions};
 pub struct AppState {
     db: PgPool
 }
@@ -36,13 +36,21 @@ async fn main() {
     };
 
     let app = Router::new()
-        .route("/api", get(hello_world))
         .route("/api/usuarios", post(handler::usuario_handler::create))
-        .with_state(Arc::new(AppState { db: pool.clone() }));
+        // .layer(ServiceBuilder::new().layer(cors_layer))
+        .with_state(Arc::new(AppState { db: pool.clone() }))
+        .layer(
+            CorsLayer::new()
+                .allow_origin(AllowOrigin::any())
+                .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+                .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
+                .expose_headers(["X-Custom-Header".parse().unwrap()]),
+        );
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
-    println!("Servidor iniciado na porta 3000!");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+
+    println!("Servidor iniciado na porta 8080!");
 
     axum::serve(listener, app).await.unwrap();
 }
