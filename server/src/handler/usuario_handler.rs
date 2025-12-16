@@ -10,7 +10,7 @@ pub async fn create(
     State(data): State<Arc<AppState>>,
     Json(body): Json<UsuarioSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-     let usuario_existente = sqlx::query_as!(
+    let usuario_existente = sqlx::query_as!(
         UsuarioModel,
         "SELECT * FROM usuarios WHERE nome = $1",
         body.nome
@@ -45,14 +45,12 @@ pub async fn create(
     )
     .fetch_one(&data.db)
     .await
-    .map_err(|e| e.to_string());
-
-    if let Err(err) = usuario {
-        return Err((
+    .map_err(|e| {
+        (
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"status": "erro", "message": format!("{:?}", err)})),
-        ));
-    }
+            Json(json!({ "error": e.to_string() })),
+        )
+    })?;
 
     let usuario_response = json!({
         "status": "ok",

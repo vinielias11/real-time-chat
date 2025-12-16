@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
-use::axum::{ Router, routing::get, routing::post, http::header, http::Method };
-use::tower_http::cors::{ CorsLayer, AllowOrigin };
+use ::axum::{Router, http::Method, http::header, routing::get, routing::post};
+use ::dotenv::dotenv;
+use ::tower_http::cors::{AllowOrigin, CorsLayer};
 use sqlx::{PgPool, postgres::PgPoolOptions};
-use::dotenv::dotenv;
 
 mod handler;
 mod model;
 mod schema;
 
 pub struct AppState {
-    db: PgPool
+    db: PgPool,
 }
 
 #[tokio::main]
@@ -22,7 +22,6 @@ async fn main() {
         .max_connections(10)
         .connect(&db_url)
         .await
-
     {
         Ok(pool) => {
             println!("Conectou no PostgreSQL!");
@@ -46,7 +45,6 @@ async fn main() {
                 .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION])
                 .expose_headers(["X-Custom-Header".parse().unwrap()]),
         );
-
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
 

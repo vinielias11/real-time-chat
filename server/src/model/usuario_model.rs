@@ -4,5 +4,5 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 pub struct UsuarioModel {
     pub id: Uuid,
-    pub nome: String
+    pub nome: String,
 }

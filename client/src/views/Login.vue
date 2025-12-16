@@ -8,6 +8,16 @@
     </div>
 </template>
 
+<style>
+.login-container {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 100px auto;
+    gap: 10px;
+}
+</style>
+
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -23,8 +33,6 @@ async function enterChat() {
 
     const nome = name.value;
 
-    localStorage.setItem("username", name.value);
-
     const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
         method: 'POST',
         body: JSON.stringify({
@@ -33,18 +41,13 @@ async function enterChat() {
         headers: {
             'Content-Type': 'application/json'
         }
-    })
+    });
+
+    const objResponse = await response.json();
+    
+    localStorage.setItem("real-time-chat-id-usuario", objResponse.data.usuario.id);
+    localStorage.setItem("real-time-chat-nome-usuario", objResponse.data.usuario.nome);
 
     router.push("/chat");
 }
 </script>
-
-<style>
-.login-container {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    margin: 100px auto;
-    gap: 10px;
-}
-</style>
