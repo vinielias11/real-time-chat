@@ -17,7 +17,8 @@
         <div class="container-interior">
             <div class="container-esquerda">
                 <div class="container-chat">
-
+                    <p>asdasd</p>
+                    <p>asdasd</p>
                 </div>
 
                 <div class="container-input">
@@ -33,7 +34,22 @@
             </div>
 
             <div class="container-direita">
-
+                <div class="container-usuario-online">
+                    <img :src="chatBubble" class="icon" />
+                    <p>Usuario</p>
+                </div>
+                <div class="container-usuario-online">
+                    <img :src="chatBubble" class="icon" />
+                    <p>Usuario</p>
+                </div>
+                <div class="container-usuario-online">
+                    <img :src="chatBubble" class="icon" />
+                    <p>Usuario</p>
+                </div>
+                <div class="container-usuario-online">
+                    <img :src="chatBubble" class="icon" />
+                    <p>Usuario</p>
+                </div>
             </div>
         </div>
 
@@ -44,7 +60,7 @@
 .container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
     background-color: rgb(192, 192, 192);
     font-family: "PxPlus IBM VGA8", monospace;
     font-size: 14px;
@@ -122,6 +138,7 @@
     flex: 1;
     margin-top: 10px;
     gap: 10px;
+    min-height: 0;
 }
 
 .container-esquerda {
@@ -129,7 +146,7 @@
     background-color: white;
     display: flex;
     flex-direction: column;
-
+    min-height: 0;
     padding: 4px;
 
     background-color: rgb(192, 192, 192);
@@ -146,11 +163,47 @@
     margin-bottom: 6px;
     padding: 6px;
     overflow-y: auto;
+    min-height: 0;
 
     border-top: 3px solid rgb(0, 0, 0);
     border-left: 3px solid rgb(0, 0, 0);
     border-right: 3px solid white;
     border-bottom: 3px solid white;
+
+    scrollbar-width: thin;                 /* Firefox */
+    scrollbar-color: rgb(128,128,128) rgb(192,192,192);
+
+    line-break: anywhere;
+}
+
+.container-chat::-webkit-scrollbar {
+    width: 16px;
+}
+
+.container-chat::-webkit-scrollbar-track {
+    background: rgb(192, 192, 192);
+    border-left: 2px solid white;
+}
+
+.container-chat::-webkit-scrollbar-thumb {
+    background: rgb(192, 192, 192);
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid rgb(128,128,128);
+    border-bottom: 2px solid rgb(128,128,128);
+}
+
+.container-chat::-webkit-scrollbar-thumb:active {
+    border-top: 2px solid rgb(128,128,128);
+    border-left: 2px solid rgb(128,128,128);
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+.container-chat p {
+    font-size: 20px;
+    margin: 2px;
 }
 
 .container-input {
@@ -176,7 +229,7 @@
     padding: 6px;
 
     font-family: "PxPlus IBM VGA8", monospace;
-    font-size: 14px;
+    font-size: 20px;
     line-height: 1.2;
     color: black;
     overflow-y: auto;
@@ -216,18 +269,30 @@
 .container-direita {
     flex: 0 0 23%;
     padding: 4px;
-    background-color: rgb(192, 192, 192);
+    background-color: white;
 
-    border-top: 1px solid white;
-    border-left: 1px solid white;
-    border-right: 1px solid rgb(128, 128, 128);
-    border-bottom: 1px solid rgb(128, 128, 128);
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-right: 2px solid rgb(102, 99, 99);
+    border-bottom: 2px solid rgb(102, 99, 99);
 }
 
+.container-usuario-online {
+    height: 55px;
+    display: flex;
+    align-items: center;
+}
 
-/* * {
-    box-sizing: border-box;
-} */
+.container-usuario-online p {
+    font-size: 22px;
+    user-select: none;
+}
+
+.container-usuario-online:hover {
+    background-color: rgb(0, 0, 128);
+    color: white;
+}
+
 
 </style>
 
