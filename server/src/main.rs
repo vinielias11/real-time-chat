@@ -36,7 +36,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/usuarios", post(handler::usuario_handler::create))
-        // .layer(ServiceBuilder::new().layer(cors_layer))
+        .route( "/api/chat", get(handler::chat_handler::websocket_handler))
         .with_state(Arc::new(AppState { db: pool.clone() }))
         .layer(
             CorsLayer::new()

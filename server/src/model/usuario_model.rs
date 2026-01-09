@@ -5,4 +5,5 @@ use uuid::Uuid;
 pub struct UsuarioModel {
     pub id: Uuid,
     pub nome: String,
+    pub cor: String
 }

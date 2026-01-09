@@ -47,6 +47,7 @@ async function enterChat() {
     
     localStorage.setItem("real-time-chat-id-usuario", objResponse.data.usuario.id);
     localStorage.setItem("real-time-chat-nome-usuario", objResponse.data.usuario.nome);
+    localStorage.setItem("real-time-chat-cor-usuario", objResponse.data.usuario.cor);
 
     router.push("/chat");
 }

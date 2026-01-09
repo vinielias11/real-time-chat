@@ -12,7 +12,7 @@ pub async fn create(
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     let usuario_existente = sqlx::query_as!(
         UsuarioModel,
-        "SELECT * FROM usuarios WHERE nome = $1",
+        "SELECT id, nome, cor FROM usuarios WHERE nome = $1",
         body.nome
     )
     .fetch_optional(&data.db)
@@ -39,7 +39,7 @@ pub async fn create(
 
     let usuario = sqlx::query_as!(
         UsuarioModel,
-        r#"INSERT INTO usuarios (id, nome) VALUES ($1, $2) RETURNING *"#,
+        r#"INSERT INTO usuarios (id, nome) VALUES ($1, $2) RETURNING id, nome, cor"#,
         &id,
         &body.nome
     )

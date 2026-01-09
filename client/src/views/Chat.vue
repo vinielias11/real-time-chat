@@ -25,9 +25,11 @@
                     <textarea
                         class="input-text"
                         placeholder="Digite sua mensagem..."
+                        v-model="mensagem"
+                        @keydown.enter.exact.prevent="enviarMensagem"
                     ></textarea>
 
-                    <div class="btn-enviar">
+                    <div class="btn-enviar" v-on:click="enviarMensagem">
                         Enviar
                     </div>
                 </div>
@@ -293,7 +295,6 @@
     color: white;
 }
 
-
 </style>
 
 <script setup>
@@ -302,13 +303,48 @@ import { useRouter } from "vue-router";
 import chatBubble from "@/assets/icons/chat-bubble.png";
 
 const router = useRouter();
-const username = ref("");
+const idUsuario = ref("");
+const nomeUsuario = ref("");
+const corUsuario = ref("#000000");
+const mensagem = ref("");
+let socket = null;
 
 onMounted(() => {
-    username.value = localStorage.getItem("real-time-chat-nome-usuario");
+    idUsuario.value = localStorage.getItem("real-time-chat-id-usuario");
+    nomeUsuario.value = localStorage.getItem("real-time-chat-nome-usuario");
+    corUsuario.value = localStorage.getItem("real-time-chat-cor-usuario");
 
-    if (!username.value) {
+    if (!idUsuario.value || !nomeUsuario.value) {
         router.push("/");
     }
+
+    socket = new WebSocket("ws://localhost:8080/api/chat");
+
+    socket.onopen = () => {
+        console.log("Conectado ao WebSocket");
+    };
+
+    socket.onmessage = (event) => {
+        console.log("Mensagem recebida:", event.data);
+    };
+
+    socket.onerror = (err) => {
+        console.error("Erro no WS", err);
+    };
 });
+
+const enviarMensagem = () => {
+    if (!mensagem.value.trim()) return;
+
+    const objMensagem = {
+        conteudo: mensagem.value,
+        id_usuario_from: idUsuario.value,
+        nome_usuario_from: nomeUsuario.value,
+        cor_criacao: corUsuario.value
+    };
+
+    socket.send(JSON.stringify(objMensagem));
+
+    mensagem.value = "";
+}
 </script>
