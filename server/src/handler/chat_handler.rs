@@ -1,25 +1,67 @@
-use axum::extract::ws::CloseFrame;
+use axum::extract::ws::{CloseFrame, Utf8Bytes};
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    extract::State,
     response::IntoResponse
 };
+use std::sync::Arc;
+use crate::AppState;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use serde_json::{Result, Value};
+use uuid::Uuid;
+
+use crate::model::mensagem_model::MensagemModel;
+use crate::schema::mensagem_schema::MensagemSchema;
 
 // WebSocketUpgrade: Extractor for establishing WebSocket connections.
-pub async fn websocket_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-    // Finalize upgrading the connection and call the provided callback with the stream.
+pub async fn websocket_handler(
+    ws: WebSocketUpgrade, 
+    State(data): State<Arc<AppState>>) -> impl IntoResponse {
+        
     ws.on_failed_upgrade(|error| println!("Error upgrading websocket: {}", error))
-        .on_upgrade(handle_socket)
+        .on_upgrade(move |socket| handle_socket(socket, State(data)))
 }
 
 // WebSocket: A stream of WebSocket messages.
-async fn handle_socket(mut socket: WebSocket) {
+async fn handle_socket(mut socket: WebSocket, State(data): State<Arc<AppState>>) {
     // Returns `None` if the stream has closed.
     while let Some(msg) = socket.recv().await {
         if let Ok(msg) = msg {
             match msg {
                 Message::Text(utf8_bytes) => {
                     println!("Text received: {}", utf8_bytes);
-                    
+
+                    let mensagem = formata_mensagem_chat(utf8_bytes.clone());
+
+                    if let Err(error) = mensagem {
+                        println!("Erro ao formatar mensagem do chat para JSON: {}", error);
+                        break;
+                    }
+
+                    let mensagem_schema: MensagemSchema = mensagem.unwrap();
+
+                    println!("MensagemSchema: {:?}", mensagem_schema);
+
+                    let id = uuid::Uuid::new_v4();
+                    let data_criacao = Utc::now();
+
+                    let query = sqlx::query("INSERT INTO mensagens (id, conteudo, id_usuario_from, nome_usuario_from, id_usuario_to, cor_criacao, data_criacao) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id")
+                    .bind(id)
+                    .bind(mensagem_schema.conteudo)
+                    .bind(mensagem_schema.id_usuario_from)
+                    .bind(mensagem_schema.nome_usuario_from)
+                    .bind(mensagem_schema.id_usuario_to)
+                    .bind(mensagem_schema.cor_criacao)
+                    .bind(data_criacao)
+                    .execute(&data.db)
+                    .await;
+
+                    if let Err(error) = query {
+                        println!("Erro ao inserir mensagem do chat no PostgreSQL: {}", error);
+                        break;
+                    }
+
                     let result = socket
                         .send(Message::Text(
                             format!("Echo back text: {}", utf8_bytes).into(),
@@ -81,4 +123,10 @@ async fn send_close_message(mut socket: WebSocket, code: u16, reason: &str) {
             reason: reason.into(),
         })))
         .await;
+}
+
+fn formata_mensagem_chat(utf8_bytes: Utf8Bytes) -> Result<MensagemSchema> {
+    let mensagem: MensagemSchema = serde_json::from_str(utf8_bytes.as_str())?;
+
+    return Ok(mensagem);
 }
