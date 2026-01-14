@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS mensagens (
     nome_usuario_from TEXT NOT NULL,
     id_usuario_to UUID,
     cor_criacao TEXT NOT NULL,
-    data_criacao TIMESTAMPTZ NULL DEFAULT NOW()
+    data_criacao TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )

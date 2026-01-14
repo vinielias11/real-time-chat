@@ -30,8 +30,6 @@ async fn handle_socket(mut socket: WebSocket, State(data): State<Arc<AppState>>)
         if let Ok(msg) = msg {
             match msg {
                 Message::Text(utf8_bytes) => {
-                    println!("Text received: {}", utf8_bytes);
-
                     let mensagem = formata_mensagem_chat(utf8_bytes.clone());
 
                     if let Err(error) = mensagem {
@@ -47,15 +45,15 @@ async fn handle_socket(mut socket: WebSocket, State(data): State<Arc<AppState>>)
                     let data_criacao = Utc::now();
 
                     let query = sqlx::query("INSERT INTO mensagens (id, conteudo, id_usuario_from, nome_usuario_from, id_usuario_to, cor_criacao, data_criacao) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id")
-                    .bind(id)
-                    .bind(mensagem_schema.conteudo)
-                    .bind(mensagem_schema.id_usuario_from)
-                    .bind(mensagem_schema.nome_usuario_from)
-                    .bind(mensagem_schema.id_usuario_to)
-                    .bind(mensagem_schema.cor_criacao)
-                    .bind(data_criacao)
-                    .execute(&data.db)
-                    .await;
+                        .bind(id)
+                        .bind(mensagem_schema.conteudo)
+                        .bind(mensagem_schema.id_usuario_from)
+                        .bind(mensagem_schema.nome_usuario_from)
+                        .bind(mensagem_schema.id_usuario_to)
+                        .bind(mensagem_schema.cor_criacao)
+                        .bind(data_criacao)
+                        .execute(&data.db)
+                        .await;
 
                     if let Err(error) = query {
                         println!("Erro ao inserir mensagem do chat no PostgreSQL: {}", error);
@@ -92,11 +90,6 @@ async fn handle_socket(mut socket: WebSocket, State(data): State<Arc<AppState>>)
                         break;
                     }
                 }
-                // Close, Ping, Pong will be handled automatically
-                // Message::Close
-                // After receiving a close frame, axum will automatically respond with a close frame if necessary (you do not have to deal with this yourself).
-                // After sending a close frame, you may still read messages, but attempts to send another message will error.
-                // Since no further messages will be received, you may either do nothing or explicitly drop the connection.
                 _ => {}
             }
         } else {
@@ -108,14 +101,6 @@ async fn handle_socket(mut socket: WebSocket, State(data): State<Arc<AppState>>)
     }
 }
 
-// We MAY “uncleanly” close a WebSocket connection at any time by simply dropping the WebSocket, ie: Break out of the recv loop.
-// However, you may also use the graceful closing protocol, in which
-// peer A sends a close frame, and does not send any further messages;
-// peer B responds with a close frame, and does not send any further messages;
-// peer A processes the remaining messages sent by peer B, before finally
-// both peers close the connection.
-//
-// Close Code: https://kapeli.com/cheat_sheets/WebSocket_Status_Codes.docset/Contents/Resources/Documents/index
 async fn send_close_message(mut socket: WebSocket, code: u16, reason: &str) {
     _ = socket
         .send(Message::Close(Some(CloseFrame {
